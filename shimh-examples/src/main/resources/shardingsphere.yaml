@@ -1,0 +1,25 @@
+dataSources:
+  ds_1:
+    dataSourceClassName: com.zaxxer.hikari.HikariDataSource
+    driverClassName: com.mysql.jdbc.Driver
+    jdbcUrl: jdbc:mysql://localhost:3306/ds_1
+    username: root
+    password: root
+  ds_2:
+    dataSourceClassName: com.zaxxer.hikari.HikariDataSource
+    driverClassName: com.mysql.jdbc.Driver
+    jdbcUrl: jdbc:mysql://localhost:3306/ds_2
+    username: root
+    password: root
+
+rules:
+  - !SINGLE #单表规则用于指定哪些单表需要被 ShardingSphere 管理，也可设置默认的单表数据源。
+    tables:
+      # MySQL 风格
+      #- ds_0.t_single # 加载指定单表
+      #- ds_1.* # 加载指定数据源中的全部单表
+      - "*.*" # 加载全部单表
+    defaultDataSource: ds_1 # 默认数据源，仅在执行 CREATE TABLE 创建单表时有效。缺失值为空，表示随机单播路由。
+
+props:
+  sql-show: true
