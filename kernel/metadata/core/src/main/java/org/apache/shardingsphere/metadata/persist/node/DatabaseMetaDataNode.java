@@ -147,6 +147,7 @@ public final class DatabaseMetaDataNode {
      * @return meta data node
      */
     public static String getMetaDataNode() {
+        // /metadata
         return String.join("/", "", ROOT_NODE);
     }
 }

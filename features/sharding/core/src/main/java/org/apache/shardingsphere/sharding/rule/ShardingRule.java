@@ -24,6 +24,7 @@ import lombok.Getter;
 import org.apache.shardingsphere.infra.algorithm.core.context.AlgorithmSQLContext;
 import org.apache.shardingsphere.infra.algorithm.core.exception.AlgorithmInitializationException;
 import org.apache.shardingsphere.infra.algorithm.keygen.core.KeyGenerateAlgorithm;
+import org.apache.shardingsphere.infra.algorithm.keygen.snowflake.SnowflakeKeyGenerateAlgorithm;
 import org.apache.shardingsphere.infra.binder.context.statement.SQLStatementContext;
 import org.apache.shardingsphere.infra.binder.context.statement.dml.SelectStatementContext;
 import org.apache.shardingsphere.infra.database.core.type.DatabaseTypeRegistry;
@@ -88,9 +89,13 @@ import java.util.stream.Collectors;
 public final class ShardingRule implements DatabaseRule {
     
     private static final String ALGORITHM_EXPRESSION_KEY = "algorithm-expression";
-    
+    /**
+     * 解析的数据分片原始配置
+     */
     private final ShardingRuleConfiguration configuration;
-    
+    /**
+     * 解析的 tables的actualDataNodes 和 autoTables的actualDataSources 中指定的数据源名称，没有的话就是配置的数据源名称
+     */
     private final Collection<String> dataSourceNames;
     
     private final Map<String, ShardingAlgorithm> shardingAlgorithms = new CaseInsensitiveMap<>();
@@ -98,19 +103,44 @@ public final class ShardingRule implements DatabaseRule {
     private final Map<String, KeyGenerateAlgorithm> keyGenerators = new CaseInsensitiveMap<>();
     
     private final Map<String, ShardingAuditAlgorithm> auditors = new CaseInsensitiveMap<>();
-    
+    /**
+     * key:逻辑表名
+     * value: 分片表规则
+     */
     private final Map<String, ShardingTable> shardingTables = new CaseInsensitiveMap<>();
-    
+    /**
+     * 解析bindingTables (+): # 绑定表规则列表
+     *   bindingTables:
+     *     - t_order,t_order_item
+     *  key: 逻辑表名 t_order
+     *  value: 一致的一组分片表规则 t_order,t_order_item
+     */
     private final Map<String, BindingTableRule> bindingTableRules = new CaseInsensitiveMap<>();
-    
+    /**
+     * defaultDatabaseStrategy: # 默认数据库分片策略
+     * 未配置为：
+     * @see NoneShardingStrategyConfiguration
+     */
     private final ShardingStrategyConfiguration defaultDatabaseShardingStrategyConfig;
-    
+    /**
+     * defaultTableStrategy: # 默认表分片策略
+     * 未配置为：
+     * @see NoneShardingStrategyConfiguration
+     */
     private final ShardingStrategyConfiguration defaultTableShardingStrategyConfig;
-    
+    /**
+     * defaultAuditStrategy: # 默认分片审计策略
+     */
     private final ShardingAuditStrategyConfiguration defaultAuditStrategy;
-    
+    /**
+     * defaultKeyGenerateStrategy: # 默认的分布式序列策略
+     * 未配置默认：
+     * @see SnowflakeKeyGenerateAlgorithm
+     */
     private final KeyGenerateAlgorithm defaultKeyGenerateAlgorithm;
-    
+    /**
+     * defaultShardingColumn: # 默认分片列名称
+     */
     private final String defaultShardingColumn;
     
     private final ShardingCache shardingCache;
@@ -119,28 +149,74 @@ public final class ShardingRule implements DatabaseRule {
     
     public ShardingRule(final ShardingRuleConfiguration ruleConfig, final Map<String, DataSource> dataSources, final InstanceContext instanceContext) {
         configuration = ruleConfig;
+        /**
+         * 解析 tables的actualDataNodes 和 autoTables的actualDataSources 中指定的数据源名称
+         *
+         * tables: # 数据分片规则配置
+         *     <logic_table_name> (+): # 逻辑表名称
+         *       actualDataNodes (?): # 由数据源名 + 表名组成（参考 Inline 语法规则）
+         *
+         * autoTables: # 自动分片表规则配置
+         *     t_order_auto: # 逻辑表名称
+         *       actualDataSources (?): # 数据源名称
+         */
         this.dataSourceNames = getDataSourceNames(ruleConfig.getTables(), ruleConfig.getAutoTables(), dataSources.keySet());
+        /**
+         * 分片算法配置、分布式序列算法配置、分片审计算法配置
+         */
         ruleConfig.getShardingAlgorithms().forEach((key, value) -> shardingAlgorithms.put(key, TypedSPILoader.getService(ShardingAlgorithm.class, value.getType(), value.getProps())));
         ruleConfig.getKeyGenerators().forEach((key, value) -> keyGenerators.put(key, TypedSPILoader.getService(KeyGenerateAlgorithm.class, value.getType(), value.getProps())));
         ruleConfig.getAuditors().forEach((key, value) -> auditors.put(key, TypedSPILoader.getService(ShardingAuditAlgorithm.class, value.getType(), value.getProps())));
+
+        /**
+         * 解析 tables 和 autoTables创建ShardingTable
+         */
         shardingTables.putAll(createShardingTables(ruleConfig.getTables(), ruleConfig.getDefaultKeyGenerateStrategy()));
         shardingTables.putAll(createShardingAutoTables(ruleConfig.getAutoTables(), ruleConfig.getDefaultKeyGenerateStrategy()));
+
         validateUniqueActualDataNodesInTableRules();
+        /**
+         * 解析bindingTables (+): # 绑定表规则列表
+         */
         bindingTableRules.putAll(createBindingTableRules(ruleConfig.getBindingTableGroups()));
+        /**
+         * defaultDatabaseStrategy: # 默认数据库分片策略
+         * defaultTableStrategy: # 默认表分片策略
+         */
         defaultDatabaseShardingStrategyConfig = createDefaultDatabaseShardingStrategyConfiguration(ruleConfig);
         defaultTableShardingStrategyConfig = createDefaultTableShardingStrategyConfiguration(ruleConfig);
+        /**
+         * defaultAuditStrategy: # 默认分片审计策略
+         */
         defaultAuditStrategy = null == ruleConfig.getDefaultAuditStrategy() ? new ShardingAuditStrategyConfiguration(Collections.emptyList(), true) : ruleConfig.getDefaultAuditStrategy();
+        /**
+         * defaultKeyGenerateStrategy: # 默认的分布式序列策略
+         */
         defaultKeyGenerateAlgorithm = null == ruleConfig.getDefaultKeyGenerateStrategy()
                 ? TypedSPILoader.getService(KeyGenerateAlgorithm.class, null)
                 : keyGenerators.get(ruleConfig.getDefaultKeyGenerateStrategy().getKeyGeneratorName());
+        /**
+         * defaultShardingColumn: # 默认分片列名称
+         */
         defaultShardingColumn = ruleConfig.getDefaultShardingColumn();
+        /**
+         * 绑定表规则校验
+         * 1.需要按照逻辑表前缀组合分片后缀的方式进行配置
+         * 2.分片规则一致
+         * https://shardingsphere.apache.org/document/5.5.0/cn/features/sharding/concept/#绑定表
+         */
         ShardingSpherePreconditions.checkState(isValidBindingTableConfiguration(shardingTables, new BindingTableCheckedConfiguration(this.dataSourceNames, shardingAlgorithms,
                 ruleConfig.getBindingTableGroups(), defaultDatabaseShardingStrategyConfig, defaultTableShardingStrategyConfig, defaultShardingColumn)),
                 InvalidBindingTablesException::new);
+        /**
+         * 工作机器唯一标识
+         * @see SnowflakeKeyGenerateAlgorithm
+         */
         keyGenerators.values().stream().filter(InstanceContextAware.class::isInstance).forEach(each -> ((InstanceContextAware) each).setInstanceContext(instanceContext));
         if (defaultKeyGenerateAlgorithm instanceof InstanceContextAware && -1 == instanceContext.getWorkerId()) {
             ((InstanceContextAware) defaultKeyGenerateAlgorithm).setInstanceContext(instanceContext);
         }
+
         shardingCache = null == ruleConfig.getShardingCache() ? null : new ShardingCache(ruleConfig.getShardingCache(), this);
         attributes = new RuleAttributes(new ShardingDataNodeRuleAttribute(shardingTables), new ShardingTableNamesRuleAttribute(shardingTables.values()));
     }
@@ -196,6 +272,9 @@ public final class ShardingRule implements DatabaseRule {
     }
     
     private ShardingTable createShardingTable(final ShardingTableRuleConfiguration tableRuleConfig, final KeyGenerateStrategyConfiguration defaultKeyGenerateStrategyConfig) {
+        /**
+         * 校验 tables 里 配置了的 databaseStrategy 和 tableStrategy 分库和分表策略的分片算法不能是自动化分片算法
+         */
         Optional.ofNullable(tableRuleConfig.getDatabaseShardingStrategy()).ifPresent(optional -> checkManualShardingAlgorithm(optional.getShardingAlgorithmName(), tableRuleConfig.getLogicTable()));
         Optional.ofNullable(tableRuleConfig.getTableShardingStrategy()).ifPresent(optional -> checkManualShardingAlgorithm(optional.getShardingAlgorithmName(), tableRuleConfig.getLogicTable()));
         return new ShardingTable(tableRuleConfig, dataSourceNames, getDefaultGenerateKeyColumn(defaultKeyGenerateStrategyConfig));
@@ -214,6 +293,9 @@ public final class ShardingRule implements DatabaseRule {
     }
     
     private ShardingTable createShardingAutoTable(final KeyGenerateStrategyConfiguration defaultKeyGenerateStrategyConfig, final ShardingAutoTableRuleConfiguration autoTableRuleConfig) {
+        /**
+         * autoTables的切分策略算法必须是自动化分片算法，否则抛异常
+         */
         checkAutoShardingAlgorithm(autoTableRuleConfig.getShardingStrategy().getShardingAlgorithmName(), autoTableRuleConfig.getLogicTable());
         ShardingAlgorithm shardingAlgorithm = shardingAlgorithms.get(autoTableRuleConfig.getShardingStrategy().getShardingAlgorithmName());
         return new ShardingTable(autoTableRuleConfig, dataSourceNames, (ShardingAutoTableAlgorithm) shardingAlgorithm, getDefaultGenerateKeyColumn(defaultKeyGenerateStrategyConfig));
@@ -249,6 +331,10 @@ public final class ShardingRule implements DatabaseRule {
     }
     
     private boolean isValidBindingTableConfiguration(final Map<String, ShardingTable> shardingTables, final BindingTableCheckedConfiguration checkedConfig) {
+        /**
+         *   bindingTables:
+         *     - t_order,t_order_item
+         */
         for (ShardingTableReferenceRuleConfiguration each : checkedConfig.getBindingTableGroups()) {
             Collection<String> bindingTables = Splitter.on(",").trimResults().splitToList(each.getReference());
             if (bindingTables.size() <= 1) {
@@ -258,9 +344,15 @@ public final class ShardingRule implements DatabaseRule {
             ShardingTable sampleShardingTable = getShardingTable(iterator.next(), shardingTables);
             while (iterator.hasNext()) {
                 ShardingTable shardingTable = getShardingTable(iterator.next(), shardingTables);
+                /**
+                 * 按照逻辑表前缀组合分片后缀的方式进行配置
+                 */
                 if (!isValidActualDataSourceName(sampleShardingTable, shardingTable) || !isValidActualTableName(sampleShardingTable, shardingTable)) {
                     return false;
                 }
+                /**
+                 * 分片规则一致
+                 */
                 if (!isBindingShardingAlgorithm(sampleShardingTable, shardingTable, true, checkedConfig) || !isBindingShardingAlgorithm(sampleShardingTable, shardingTable, false, checkedConfig)) {
                     return false;
                 }

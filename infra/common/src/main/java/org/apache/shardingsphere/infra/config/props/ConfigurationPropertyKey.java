@@ -52,6 +52,10 @@ public enum ConfigurationPropertyKey implements TypedPropertyKey {
     /**
      * The max thread size of worker group to execute SQL.
      */
+    /**
+     * 用于设置任务处理线程池的大小
+     * 每个 ShardingSphereDataSource 使用一个独立的线程池，同一个 JVM 的不同数据源不共享线程池
+     */
     KERNEL_EXECUTOR_SIZE("kernel-executor-size", String.valueOf(0), int.class, true),
     
     /**

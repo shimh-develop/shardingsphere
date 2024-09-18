@@ -64,6 +64,7 @@ public final class DatabaseMetaDataPersistService implements DatabaseMetaDataBas
     
     @Override
     public Collection<String> loadAllDatabaseNames() {
+        // parent = /metadata
         return repository.getChildrenKeys(DatabaseMetaDataNode.getMetaDataNode());
     }
     

@@ -39,7 +39,12 @@ public final class ComputeNodeInstance {
     private final InstanceStateContext state = new InstanceStateContext();
     
     private Collection<String> labels = new LinkedList<>();
-    
+
+    /**
+     * 单机模式
+     * @see org.apache.shardingsphere.infra.algorithm.keygen.snowflake.SnowflakeKeyGenerateAlgorithm
+     * 配置的 work-id
+     */
     @Setter
     private volatile int workerId;
     

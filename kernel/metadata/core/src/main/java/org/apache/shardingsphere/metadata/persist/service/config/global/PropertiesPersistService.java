@@ -41,6 +41,9 @@ public final class PropertiesPersistService implements GlobalPersistService<Prop
     
     @Override
     public void persist(final Properties props) {
+        /**
+         * /props/versions/[version] = props
+         */
         if (Strings.isNullOrEmpty(getActiveVersion())) {
             repository.persist(GlobalNode.getPropsActiveVersionNode(), DEFAULT_VERSION);
         }

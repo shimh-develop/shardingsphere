@@ -63,7 +63,9 @@ import java.util.stream.Collectors;
 public final class StandaloneModeContextManager implements ModeContextManager, ContextManagerAware {
     
     private final RuleConfigurationEventBuilder ruleConfigurationEventBuilder = new RuleConfigurationEventBuilder();
-    
+    /**
+     * @see StandaloneContextManagerBuilder#build(org.apache.shardingsphere.mode.manager.ContextManagerBuilderParameter)
+     */
     private ContextManager contextManager;
     
     @Override

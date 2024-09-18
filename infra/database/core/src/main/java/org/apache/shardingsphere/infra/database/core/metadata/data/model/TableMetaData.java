@@ -33,15 +33,25 @@ import java.util.Collection;
 @EqualsAndHashCode
 @ToString
 public final class TableMetaData {
-    
+    /**
+     * 表名
+     */
     private final String name;
-    
+    /**
+     * 列元数据信息
+     */
     private final Collection<ColumnMetaData> columns;
-    
+    /**
+     * 索引
+     */
     private final Collection<IndexMetaData> indexes;
-    
+    /**
+     * 约束
+     */
     private final Collection<ConstraintMetaData> constraints;
-    
+    /**
+     * 当前是视图还是表
+     */
     private final TableType type;
     
     public TableMetaData(final String name, final Collection<ColumnMetaData> columns, final Collection<IndexMetaData> indexes, final Collection<ConstraintMetaData> constraints) {

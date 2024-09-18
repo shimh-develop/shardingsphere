@@ -53,15 +53,23 @@ import java.util.stream.Collectors;
  */
 @Getter
 public final class ShardingSphereDatabase {
-    
+    /**
+     * 数据库名
+     */
     private final String name;
     
     private final DatabaseType protocolType;
-    
+    /**
+     * 数据源相关
+     */
     private final ResourceMetaData resourceMetaData;
-    
+    /**
+     * 解析的各个规则：分片、读写分离
+     */
     private final RuleMetaData ruleMetaData;
-    
+    /**
+     * 表信息：列、索引、约束
+     */
     private final Map<String, ShardingSphereSchema> schemas;
     
     public ShardingSphereDatabase(final String name, final DatabaseType protocolType, final ResourceMetaData resourceMetaData,
@@ -88,11 +96,21 @@ public final class ShardingSphereDatabase {
      */
     public static ShardingSphereDatabase create(final String name, final DatabaseType protocolType, final Map<String, DatabaseType> storageTypes,
                                                 final DatabaseConfiguration databaseConfig, final ConfigurationProperties props, final InstanceContext instanceContext) throws SQLException {
+        /**
+         * 校验规则配置正确性、解析各个规则创建对应的对象
+         * @see org.apache.shardingsphere.sharding.rule.ShardingRule
+         */
         Collection<ShardingSphereRule> databaseRules = DatabaseRulesBuilder.build(name, protocolType, databaseConfig, instanceContext);
+        /**
+         * 从数据库加载表的信息：列、索引、约束
+         * key: 表名
+         */
         Map<String, ShardingSphereSchema> schemas = new ConcurrentHashMap<>(GenericSchemaBuilder
                 .build(new GenericSchemaBuilderMaterial(protocolType, storageTypes, DataSourceStateManager.getInstance().getEnabledDataSources(name, databaseConfig), databaseRules,
                         props, new DatabaseTypeRegistry(protocolType).getDefaultSchemaName(name))));
+
         SystemSchemaBuilder.build(name, protocolType, props).forEach(schemas::putIfAbsent);
+
         return create(name, protocolType, databaseConfig, databaseRules, schemas);
     }
     

@@ -31,9 +31,14 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 @Getter
 public final class ShardingSphereSchema {
-    
+    /**
+     * key: 表名
+     * 表信息：列、索引、约束
+     */
     private final Map<String, ShardingSphereTable> tables;
-    
+    /**
+     * 空
+     */
     private final Map<String, ShardingSphereView> views;
     
     @SuppressWarnings("CollectionWithoutInitialCapacity")

@@ -43,9 +43,13 @@ import java.util.Optional;
  */
 @Getter
 public final class MetaDataContexts implements AutoCloseable {
-    
+    /**
+     * 根据模式配置创建的持久化service
+     */
     private final MetaDataBasedPersistService persistService;
-    
+    /**
+     * 全局规则、数据库表信息
+     */
     private final ShardingSphereMetaData metaData;
     
     private final ShardingSphereStatistics statistics;

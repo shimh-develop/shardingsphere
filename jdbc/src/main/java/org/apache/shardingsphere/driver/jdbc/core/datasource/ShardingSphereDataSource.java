@@ -27,6 +27,7 @@ import org.apache.shardingsphere.infra.config.rule.scope.GlobalRuleConfiguration
 import org.apache.shardingsphere.infra.instance.metadata.InstanceMetaData;
 import org.apache.shardingsphere.infra.instance.metadata.InstanceMetaDataBuilder;
 import org.apache.shardingsphere.infra.instance.metadata.InstanceType;
+import org.apache.shardingsphere.infra.instance.metadata.jdbc.JDBCInstanceMetaData;
 import org.apache.shardingsphere.infra.metadata.database.resource.unit.StorageUnit;
 import org.apache.shardingsphere.infra.spi.ShardingSphereServiceLoader;
 import org.apache.shardingsphere.infra.spi.type.typed.TypedSPILoader;
@@ -71,13 +72,23 @@ public final class ShardingSphereDataSource extends AbstractDataSourceAdapter im
     public ShardingSphereDataSource(final String databaseName, final ModeConfiguration modeConfig, final Map<String, DataSource> dataSourceMap,
                                     final Collection<RuleConfiguration> ruleConfigs, final Properties props) throws SQLException {
         this.databaseName = databaseName;
+        /**
+         * 解析规则配置
+         *
+         * 加载表信息：列、索引、约束
+         *
+         * 根据模式配置持久化
+         */
         contextManager = createContextManager(databaseName, modeConfig, dataSourceMap, ruleConfigs, null == props ? new Properties() : props);
         contextManagerInitializedCallback(databaseName, contextManager);
     }
     
     private ContextManager createContextManager(final String databaseName, final ModeConfiguration modeConfig, final Map<String, DataSource> dataSourceMap,
                                                 final Collection<RuleConfiguration> ruleConfigs, final Properties props) throws SQLException {
-        // 当前ShardingSphere实例的元数据信息
+        /**
+         * 当前ShardingSphere实例的元数据信息 id、本机ip、shardingsphere版本号
+         * @see JDBCInstanceMetaData
+         */
         InstanceMetaData instanceMetaData = TypedSPILoader.getService(InstanceMetaDataBuilder.class, "JDBC").build(-1);
         // 全局规则配置
         Collection<RuleConfiguration> globalRuleConfigs = ruleConfigs.stream().filter(GlobalRuleConfiguration.class::isInstance).collect(Collectors.toList());

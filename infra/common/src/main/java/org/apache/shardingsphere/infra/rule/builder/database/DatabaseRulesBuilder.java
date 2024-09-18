@@ -64,8 +64,16 @@ public final class DatabaseRulesBuilder {
             Map<String, DataSource> dataSources = databaseConfig.getStorageUnits().entrySet().stream()
                     .collect(Collectors.toMap(Entry::getKey, storageUnit -> storageUnit.getValue().getDataSource(), (oldValue, currentValue) -> oldValue, LinkedHashMap::new));
             if (null != configChecker) {
+                /**
+                 * 校验配置文件配置的规则：数据分片、读写分离等是否正确
+                 * @see org.apache.shardingsphere.sharding.checker.ShardingRuleConfigurationChecker
+                 */
                 configChecker.check(databaseName, entry.getKey(), dataSources, result);
             }
+            /**
+             * 解析配置文件配置的规则：数据分片、读写分离等
+             * @see org.apache.shardingsphere.sharding.rule.builder.ShardingRuleBuilder
+             */
             result.add(entry.getValue().build(entry.getKey(), databaseName, protocolType, dataSources, result, instanceContext));
         }
         return result;

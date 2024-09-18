@@ -47,9 +47,21 @@ public final class StandaloneContextManagerBuilder implements ContextManagerBuil
         // 不配置null
         PersistRepositoryConfiguration repositoryConfig = param.getModeConfiguration().getRepository();
         /**
+         * 元数据持久化仓库
+         * https://shardingsphere.apache.org/document/5.5.0/cn/user-manual/common-config/builtin-algorithm/metadata-repository/
+         *  mode:
+         *   type: Standalone
+         *   repository:
+         *     type: JDBC
+         *     props:
+         *       provider: H2
+         *       jdbc_url: jdbc:h2:mem:config;DB_CLOSE_DELAY=-1;DATABASE_TO_UPPER=false;MODE=MYSQL
+         *       username: test
+         *       password: Test@123
          * 默认
          * @see org.apache.shardingsphere.mode.repository.standalone.jdbc.JDBCRepository
-         * 在元数据持久化数据库创建表
+         *  在数据库中创建表，未配置默认使用H2
+         *
          */
         StandalonePersistRepository repository = TypedSPILoader.getService(
                 StandalonePersistRepository.class, null == repositoryConfig ? null : repositoryConfig.getType(), null == repositoryConfig ? new Properties() : repositoryConfig.getProps());
@@ -61,11 +73,22 @@ public final class StandaloneContextManagerBuilder implements ContextManagerBuil
         InstanceContext instanceContext = buildInstanceContext(param);
 
         new StandaloneProcessSubscriber(instanceContext.getEventBusContext());
-
+        /**
+         * 在解析并加载 YAML 文件为 ShardingSphere 的元数据后， 会再次通过模式配置的相关配置决定下一步行为。讨论两种情况，
+         *
+         * 元数据持久化仓库中不存在 ShardingSphere 的元数据，本地元数据将被存储到元数据持久化仓库。
+         * 元数据持久化仓库中已存在 ShardingSphere 的元数据，无论是否与本地元数据相同，本地元数据将被元数据持久化仓库的元数据覆盖
+         *
+         * 加载表信息：列、索引、约束
+         */
         MetaDataContexts metaDataContexts = MetaDataContextsFactory.create(persistService, param, instanceContext);
+
         ContextManager result = new ContextManager(metaDataContexts, instanceContext);
+
         registerSubscriber(result);
+
         setContextManagerAware(result);
+
         return result;
     }
     

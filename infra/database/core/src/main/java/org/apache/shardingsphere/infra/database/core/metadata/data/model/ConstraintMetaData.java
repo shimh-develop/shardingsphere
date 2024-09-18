@@ -30,7 +30,9 @@ import lombok.ToString;
 @EqualsAndHashCode
 @ToString
 public final class ConstraintMetaData {
-    
+    /**
+     * 约束名称
+     */
     private final String name;
     
     private final String referencedTableName;

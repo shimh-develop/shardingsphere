@@ -41,7 +41,9 @@ import java.util.stream.Collectors;
  */
 @Getter
 public final class RuleMetaData {
-    
+    /**
+     * 解析的各个规则：分片、读写分离
+     */
     private final Collection<ShardingSphereRule> rules;
     
     public RuleMetaData(final Collection<ShardingSphereRule> rules) {

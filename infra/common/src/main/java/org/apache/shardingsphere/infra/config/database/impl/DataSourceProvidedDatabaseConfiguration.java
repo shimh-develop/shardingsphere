@@ -51,15 +51,16 @@ public final class DataSourceProvidedDatabaseConfiguration implements DatabaseCo
     /**
      * key:dataSourceName
      * value: 实际的数据库连接池
+     * 配置文件转换后的：数据源名称key重复的话，后者覆盖前者
      */
     private final Map<StorageNode, DataSource> dataSources;
     
     public DataSourceProvidedDatabaseConfiguration(final Map<String, DataSource> dataSources, final Collection<RuleConfiguration> ruleConfigs) {
         this.ruleConfigurations = ruleConfigs;
-        // 同名数据源 保留前者
+        // 数据源名称key 去重
         Map<String, StorageNode> storageUnitNodeMap = dataSources.keySet().stream()
                 .collect(Collectors.toMap(each -> each, StorageNode::new, (oldValue, currentValue) -> oldValue, LinkedHashMap::new));
-        // 同名数据源 后者覆盖前者
+        // 数据源名称key重复的话，后者覆盖前者
         Map<StorageNode, DataSource> storageNodeDataSources = StorageNodeAggregator.aggregateDataSources(dataSources);
         storageUnits = getStorageUnits(storageUnitNodeMap, storageNodeDataSources, createDataSourcePoolPropertiesMap(dataSources));
         this.dataSources = storageNodeDataSources;
@@ -87,6 +88,9 @@ public final class DataSourceProvidedDatabaseConfiguration implements DatabaseCo
     }
     
     private Map<String, DataSourcePoolProperties> createDataSourcePoolPropertiesMap(final Map<String, DataSource> dataSources) {
+        /**
+         * 数据源名称key重复的话，忽略后者
+         */
         return dataSources.entrySet().stream()
                 .collect(Collectors.toMap(Entry::getKey, entry -> DataSourcePoolPropertiesCreator.create(entry.getValue()), (oldValue, currentValue) -> oldValue, LinkedHashMap::new));
     }

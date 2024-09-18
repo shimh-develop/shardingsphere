@@ -52,6 +52,9 @@ public final class GlobalRulesBuilder {
                                                             final Map<String, ShardingSphereDatabase> databases, final ConfigurationProperties props) {
         Collection<ShardingSphereRule> result = new LinkedList<>();
         for (Entry<RuleConfiguration, GlobalRuleBuilder> entry : getRuleBuilderMap(globalRuleConfigs).entrySet()) {
+            /**
+             * 全局规则
+             */
             result.add(entry.getValue().build(entry.getKey(), databases, props));
         }
         return result;

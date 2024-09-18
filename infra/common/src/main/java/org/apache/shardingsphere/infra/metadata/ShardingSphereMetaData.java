@@ -43,13 +43,23 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 @Getter
 public final class ShardingSphereMetaData {
-    
+    /**
+     * 加载表的信息：列、索引、约束
+     */
     private final Map<String, ShardingSphereDatabase> databases;
-    
+    /**
+     * 空
+     */
     private final ResourceMetaData globalResourceMetaData;
-    
+    /**
+     * 全局的规则
+     */
     private final RuleMetaData globalRuleMetaData;
-    
+    /**
+     * 属性配置
+     * props:
+     *     sql-show: true
+     */
     private final ConfigurationProperties props;
     
     private final TemporaryConfigurationProperties temporaryProps;

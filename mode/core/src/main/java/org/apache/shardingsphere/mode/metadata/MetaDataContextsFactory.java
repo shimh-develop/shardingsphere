@@ -85,17 +85,17 @@ public final class MetaDataContextsFactory {
     public static MetaDataContexts create(final MetaDataPersistService persistService, final ContextManagerBuilderParameter param,
                                           final InstanceContext instanceContext, final Map<String, StorageNodeDataSource> storageNodes) throws SQLException {
         /**
-         * 元数据数据库表里是否有 /metadata 的子节点
+         * 元数据持久化仓库里是否有配置数据 -> parent = /metadata
          */
         boolean isDatabaseMetaDataExisted = !persistService.getDatabaseMetaDataService().loadAllDatabaseNames().isEmpty();
         /**
-         * 如果元数据数据库里存在配置 则关闭从配置文件中创建的实际的数据库连接池，使用数据库里的配置重新构建
+         * 如果元数据持久化仓库里存在配置 则关闭从本地配置文件中创建的实际的数据库连接池，使用元数据持久化仓库里的配置重新构建 DataSourceGeneratedDatabaseConfiguration 对象
          * @see DataSourceGeneratedDatabaseConfiguration
          */
         Map<String, DatabaseConfiguration> effectiveDatabaseConfigs = isDatabaseMetaDataExisted
                 ? createEffectiveDatabaseConfigurations(getDatabaseNames(instanceContext, param.getDatabaseConfigs(), persistService), param.getDatabaseConfigs(), persistService)
                 : param.getDatabaseConfigs();
-        // 不走 跳过
+        // 单机模式 不走 跳过
         checkDataSourceStates(effectiveDatabaseConfigs, storageNodes, param.isForce());
 
         // TODO load global data sources from persist service
@@ -105,13 +105,20 @@ public final class MetaDataContextsFactory {
         Collection<RuleConfiguration> globalRuleConfigs = isDatabaseMetaDataExisted ? persistService.getGlobalRuleService().load() : param.getGlobalRuleConfigs();
         // 属性配置
         ConfigurationProperties props = isDatabaseMetaDataExisted ? new ConfigurationProperties(persistService.getPropsService().load()) : new ConfigurationProperties(param.getProps());
+        /**
+         * 加载表的信息：列、索引、约束
+         */
         Map<String, ShardingSphereDatabase> databases = isDatabaseMetaDataExisted
                 ? InternalMetaDataFactory.create(persistService, effectiveDatabaseConfigs, props, instanceContext)
                 : ExternalMetaDataFactory.create(effectiveDatabaseConfigs, props, instanceContext);
+
         ResourceMetaData globalResourceMetaData = new ResourceMetaData(globalDataSources);
         RuleMetaData globalRuleMetaData = new RuleMetaData(GlobalRulesBuilder.buildRules(globalRuleConfigs, databases, props));
         MetaDataContexts result = new MetaDataContexts(persistService, new ShardingSphereMetaData(databases, globalResourceMetaData, globalRuleMetaData, props));
         if (!isDatabaseMetaDataExisted) {
+            /**
+             * 元数据持久化
+             */
             persistDatabaseConfigurations(result, param);
             persistMetaData(result);
         }
@@ -171,6 +178,7 @@ public final class MetaDataContextsFactory {
     }
     
     private static void persistDatabaseConfigurations(final MetaDataContexts metadataContexts, final ContextManagerBuilderParameter param) {
+        // 元数据持久化：属性配置 和 全局规则配置
         metadataContexts.getPersistService().persistGlobalRuleConfiguration(param.getGlobalRuleConfigs(), param.getProps());
         for (Entry<String, ? extends DatabaseConfiguration> entry : param.getDatabaseConfigs().entrySet()) {
             String databaseName = entry.getKey();

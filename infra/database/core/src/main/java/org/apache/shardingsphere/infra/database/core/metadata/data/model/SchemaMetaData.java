@@ -34,6 +34,8 @@ import java.util.Collection;
 public final class SchemaMetaData {
     
     private final String name;
-    
+    /**
+     * 表信息：列、索引、约束
+     */
     private final Collection<TableMetaData> tables;
 }

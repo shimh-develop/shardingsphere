@@ -46,7 +46,7 @@
         <module>test</module>
         
         <module>distribution</module>
-        <module>shimh-examples</module>
+        <module>examples-shimh</module>
     </modules>
     
     <properties>

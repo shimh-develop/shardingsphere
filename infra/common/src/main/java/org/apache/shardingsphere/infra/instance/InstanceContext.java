@@ -54,7 +54,9 @@ public final class InstanceContext {
      */
     @Getter(AccessLevel.NONE)
     private final WorkerIdGenerator workerIdGenerator;
-    
+    /**
+     * 模式配置
+     */
     private final ModeConfiguration modeConfiguration;
     /**
      * 单机模式

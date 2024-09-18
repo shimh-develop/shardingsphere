@@ -29,10 +29,7 @@ import org.apache.shardingsphere.infra.database.core.metadata.database.datatype.
 import org.apache.shardingsphere.infra.database.core.metadata.database.enums.TableType;
 
 import javax.sql.DataSource;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -68,9 +65,27 @@ public final class MySQLMetaDataLoader implements DialectMetaDataLoader {
     @Override
     public Collection<SchemaMetaData> load(final MetaDataLoaderMaterial material) throws SQLException {
         Collection<TableMetaData> tableMetaDataList = new LinkedList<>();
+        /**
+         * 表中列元数据信息
+         * key: 表名
+         * value: 列元数据信息
+         */
         Map<String, Collection<ColumnMetaData>> columnMetaDataMap = loadColumnMetaDataMap(material.getDataSource(), material.getActualTableNames());
+        /**
+         * 视图列表
+         */
         Collection<String> viewNames = loadViewNames(material.getDataSource(), columnMetaDataMap.keySet());
+        /**
+         * 索引信息
+         * key: 表名
+         * value: 索引信息
+         */
         Map<String, Collection<IndexMetaData>> indexMetaDataMap = columnMetaDataMap.isEmpty() ? Collections.emptyMap() : loadIndexMetaData(material.getDataSource(), columnMetaDataMap.keySet());
+        /**
+         * 约束信息
+         * key: 表名
+         * value: 约束信息
+         */
         Map<String, Collection<ConstraintMetaData>> constraintMetaDataMap =
                 columnMetaDataMap.isEmpty() ? Collections.emptyMap() : loadConstraintMetaDataMap(material.getDataSource(), columnMetaDataMap.keySet());
         for (Entry<String, Collection<ColumnMetaData>> entry : columnMetaDataMap.entrySet()) {
@@ -131,12 +146,22 @@ public final class MySQLMetaDataLoader implements DialectMetaDataLoader {
         try (
                 Connection connection = dataSource.getConnection();
                 PreparedStatement preparedStatement = connection.prepareStatement(getTableMetaDataSQL(tables))) {
+            /**
+             * 数据类型对应的值
+             * @see Types
+             */
             Map<String, Integer> dataTypes = new DataTypeLoader().load(connection.getMetaData(), getType());
+            /**
+             * 数据库名
+             */
             String databaseName = "".equals(connection.getCatalog()) ? GlobalDataSourceRegistry.getInstance().getCachedDatabaseTables().get(tables.iterator().next()) : connection.getCatalog();
             preparedStatement.setString(1, databaseName);
             try (ResultSet resultSet = preparedStatement.executeQuery()) {
                 while (resultSet.next()) {
                     String tableName = resultSet.getString("TABLE_NAME");
+                    /**
+                     * 列元数据信息
+                     */
                     ColumnMetaData columnMetaData = loadColumnMetaData(dataTypes, resultSet);
                     if (!result.containsKey(tableName)) {
                         result.put(tableName, new LinkedList<>());

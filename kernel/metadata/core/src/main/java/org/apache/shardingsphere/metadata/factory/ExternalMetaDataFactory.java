@@ -67,8 +67,14 @@ public final class ExternalMetaDataFactory {
     public static Map<String, ShardingSphereDatabase> create(final Map<String, DatabaseConfiguration> databaseConfigMap,
                                                              final ConfigurationProperties props, final InstanceContext instanceContext) throws SQLException {
         DatabaseType protocolType = DatabaseTypeEngine.getProtocolType(databaseConfigMap, props);
+        /**
+         * 数据库自身的系统数据库
+         */
         SystemDatabase systemDatabase = new SystemDatabase(protocolType);
         Map<String, ShardingSphereDatabase> result = new ConcurrentHashMap<>(databaseConfigMap.size() + systemDatabase.getSystemDatabaseSchemaMap().size(), 1F);
+        /**
+         * 加载表的信息：列、索引、约束
+         */
         result.putAll(createGenericDatabases(databaseConfigMap, protocolType, systemDatabase, props, instanceContext));
         result.putAll(createSystemDatabases(databaseConfigMap, protocolType, systemDatabase, props));
         return result;
@@ -81,7 +87,13 @@ public final class ExternalMetaDataFactory {
         for (Entry<String, DatabaseConfiguration> entry : databaseConfigMap.entrySet()) {
             String databaseName = entry.getKey();
             if (!entry.getValue().getStorageUnits().isEmpty() || !systemDatabase.getSystemSchemas().contains(databaseName)) {
+                /**
+                 * 数据源对应的数据库类型
+                 */
                 Map<String, DatabaseType> storageTypes = DatabaseTypeEngine.getStorageTypes(entry.getKey(), entry.getValue());
+                /**
+                 * 加载表的信息：列、索引、约束
+                 */
                 result.put(databaseName.toLowerCase(), ShardingSphereDatabase.create(databaseName, protocolType, storageTypes, entry.getValue(), props, instanceContext));
             }
         }
@@ -91,6 +103,9 @@ public final class ExternalMetaDataFactory {
     private static Map<String, ShardingSphereDatabase> createSystemDatabases(final Map<String, DatabaseConfiguration> databaseConfigMap, final DatabaseType protocolType,
                                                                              final SystemDatabase systemDatabase, final ConfigurationProperties props) {
         Map<String, ShardingSphereDatabase> result = new HashMap<>(systemDatabase.getSystemDatabaseSchemaMap().size(), 1F);
+        /**
+         * mysql: information_schema、performance_schema、mysql、sys、shardingsphere
+         */
         for (String each : systemDatabase.getSystemDatabaseSchemaMap().keySet()) {
             if (!databaseConfigMap.containsKey(each) || databaseConfigMap.get(each).getStorageUnits().isEmpty()) {
                 result.put(each.toLowerCase(), ShardingSphereDatabase.create(each, protocolType, props));

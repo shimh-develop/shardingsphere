@@ -61,6 +61,9 @@ public final class MetaDataLoader {
         Map<String, SchemaMetaData> result = new LinkedHashMap<>(materials.size(), 1F);
         Collection<Future<Collection<SchemaMetaData>>> futures = new LinkedList<>();
         for (MetaDataLoaderMaterial each : materials) {
+            /**
+             * 从数据库加载表的信息：列、索引、约束
+             */
             futures.add(EXECUTOR_SERVICE.submit(() -> load(each)));
         }
         try {
@@ -82,6 +85,9 @@ public final class MetaDataLoader {
         Optional<DialectMetaDataLoader> dialectLoader = DatabaseTypedSPILoader.findService(DialectMetaDataLoader.class, material.getStorageType());
         if (dialectLoader.isPresent()) {
             try {
+                /**
+                 * 从数据库加载表的信息：列、索引、约束
+                 */
                 return dialectLoader.get().load(material);
             } catch (final SQLException ex) {
                 log.debug("Dialect load schema meta data error.", ex);

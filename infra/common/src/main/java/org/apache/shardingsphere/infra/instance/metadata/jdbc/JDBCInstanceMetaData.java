@@ -28,11 +28,17 @@ import org.apache.shardingsphere.infra.instance.util.IpUtils;
  */
 @Getter
 public final class JDBCInstanceMetaData implements InstanceMetaData {
-    
+    /**
+     * uuid
+     */
     private final String id;
-    
+    /**
+     * 本机IP
+     */
     private final String ip;
-    
+    /**
+     * @see ShardingSphereVersion#VERSION
+     */
     private final String version;
     
     public JDBCInstanceMetaData(final String id) {

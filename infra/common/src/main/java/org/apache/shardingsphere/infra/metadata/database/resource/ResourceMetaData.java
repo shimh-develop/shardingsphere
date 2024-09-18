@@ -39,9 +39,16 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 @Getter
 public final class ResourceMetaData {
-    
+    /**
+     * key:dataSourceName
+     * value: 实际的数据库连接池
+     * 配置文件转换后的：数据源名称key重复的话，后者覆盖前者
+     */
     private final Map<StorageNode, DataSource> dataSources;
-    
+    /**
+     * key:dataSourceName
+     * value: 从jdbc_url中解析的一些信息、DataSource
+     */
     private final Map<String, StorageUnit> storageUnits;
     
     public ResourceMetaData(final Map<String, DataSource> dataSources) {

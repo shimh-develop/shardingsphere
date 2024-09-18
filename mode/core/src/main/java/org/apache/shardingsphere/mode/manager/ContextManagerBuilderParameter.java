@@ -47,7 +47,7 @@ public final class ContextManagerBuilderParameter {
      * 默认值：logic_db
      * databaseName (?):
      * value:
-     * @see DataSourceProvidedDatabaseConfiguration
+     * @see DataSourceProvidedDatabaseConfiguration （配置文件中创建）
      *
      */
     private final Map<String, DatabaseConfiguration> databaseConfigs;

@@ -60,7 +60,10 @@ import java.util.concurrent.atomic.AtomicReference;
 @Getter
 @Slf4j
 public final class ContextManager implements AutoCloseable {
-    
+    /**
+     * 规则配置
+     * 加载表信息：列、索引、约束
+     */
     private final AtomicReference<MetaDataContexts> metaDataContexts;
     
     private final InstanceContext instanceContext;
@@ -81,6 +84,7 @@ public final class ContextManager implements AutoCloseable {
         shardingSphereDatabaseContextManager = new ShardingSphereDatabaseContextManager(this.metaDataContexts);
         configurationContextManager = new ConfigurationContextManager(this.metaDataContexts, instanceContext);
         resourceMetaDataContextManager = new ResourceMetaDataContextManager(this.metaDataContexts);
+
         executorEngine = ExecutorEngine.createExecutorEngineWithSize(metaDataContexts.getMetaData().getProps().<Integer>getValue(ConfigurationPropertyKey.KERNEL_EXECUTOR_SIZE));
     }
     

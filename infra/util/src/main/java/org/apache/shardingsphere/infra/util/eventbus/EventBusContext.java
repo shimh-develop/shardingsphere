@@ -35,7 +35,11 @@ public final class EventBusContext {
     
     /**
      * Register object.
-     * 
+     * 单机注册：
+     * @see org.apache.shardingsphere.mode.manager.standalone.subscriber.StandaloneProcessSubscriber
+     * @see org.apache.shardingsphere.mode.subsciber.RuleItemChangedSubscriber
+     *
+     *
      * @param object object
      */
     public void register(final Object object) {

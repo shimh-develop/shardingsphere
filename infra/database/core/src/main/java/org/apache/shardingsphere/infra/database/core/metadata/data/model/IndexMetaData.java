@@ -34,11 +34,17 @@ import java.util.LinkedList;
 @EqualsAndHashCode
 @ToString
 public final class IndexMetaData {
-    
+    /**
+     * 索引名
+     */
     private final String name;
-    
+    /**
+     * 包含的列
+     */
     private final Collection<String> columns = new LinkedList<>();
-    
+    /**
+     * 是否唯一
+     */
     @Setter
     private boolean unique;
 }

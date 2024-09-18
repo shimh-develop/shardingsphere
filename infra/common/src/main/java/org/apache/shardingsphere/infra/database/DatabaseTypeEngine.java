@@ -70,11 +70,18 @@ public final class DatabaseTypeEngine {
      * @return protocol type
      */
     public static DatabaseType getProtocolType(final Map<String, ? extends DatabaseConfiguration> databaseConfigs, final ConfigurationProperties props) {
+        /**
+         * shardingsphere-proxy 的逻辑
+         */
         Optional<DatabaseType> configuredDatabaseType = findConfiguredDatabaseType(props);
         if (configuredDatabaseType.isPresent()) {
             return configuredDatabaseType.get();
         }
+
         Map<String, DataSource> enabledDataSources = getEnabledDataSources(databaseConfigs);
+        /**
+         * 默认MySQL
+         */
         return enabledDataSources.isEmpty() ? getDefaultStorageType() : getStorageType(enabledDataSources.values().iterator().next());
     }
     

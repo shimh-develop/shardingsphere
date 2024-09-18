@@ -22,11 +22,17 @@ import lombok.RequiredArgsConstructor;
 
 /**
  * Mode configuration.
+ * 模式配置
+ * https://shardingsphere.apache.org/document/5.5.0/cn/user-manual/shardingsphere-jdbc/yaml-config/mode/
+ * mode:
+ *   type: Standalone
+ *   repository:
+ *     type: JDBC
  */
 @RequiredArgsConstructor
 @Getter
 public final class ModeConfiguration {
-    
+
     private final String type;
     
     private final PersistRepositoryConfiguration repository;

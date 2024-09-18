@@ -35,6 +35,7 @@ public final class SystemDatabase {
     
     /**
      * Get system database schema map.
+     * mysql: information_schema、performance_schema、mysql、sys、shardingsphere
      *
      * @return system database schema map
      */

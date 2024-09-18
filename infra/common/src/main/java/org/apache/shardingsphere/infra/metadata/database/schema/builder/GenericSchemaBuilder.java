@@ -65,6 +65,10 @@ public final class GenericSchemaBuilder {
      * @throws SQLException SQL exception
      */
     public static Map<String, ShardingSphereSchema> build(final GenericSchemaBuilderMaterial material) throws SQLException {
+        /**
+         * 从数据库加载表的信息：列、索引、约束
+         * key: 表名
+         */
         return build(getAllTableNames(material.getRules()), material);
     }
     
@@ -77,6 +81,10 @@ public final class GenericSchemaBuilder {
      * @throws SQLException SQL exception
      */
     public static Map<String, ShardingSphereSchema> build(final Collection<String> tableNames, final GenericSchemaBuilderMaterial material) throws SQLException {
+        /**
+         * 从数据库加载表的信息：列、索引、约束
+         * key: 表名
+         */
         Map<String, SchemaMetaData> result = loadSchemas(tableNames, material);
         if (!material.isSameProtocolAndStorageTypes()) {
             result = translate(result, material);
@@ -95,6 +103,9 @@ public final class GenericSchemaBuilder {
     private static Map<String, SchemaMetaData> loadSchemas(final Collection<String> tableNames, final GenericSchemaBuilderMaterial material) throws SQLException {
         boolean checkMetaDataEnable = material.getProps().getValue(ConfigurationPropertyKey.CHECK_TABLE_METADATA_ENABLED);
         Collection<MetaDataLoaderMaterial> materials = SchemaMetaDataUtils.getMetaDataLoaderMaterials(tableNames, material, checkMetaDataEnable);
+        /**
+         * 从数据库加载表的信息：列、索引、约束
+         */
         return materials.isEmpty() ? Collections.emptyMap() : MetaDataLoader.load(materials);
     }
     

@@ -61,6 +61,7 @@ public final class GlobalNode {
      * @return global rule versions node
      */
     public static String getGlobalRuleVersionsNode(final String ruleName) {
+        // /rules/[ruleName]/versions
         return String.join("/", getGlobalRuleRootNode(), ruleName, VERSIONS);
     }
     
