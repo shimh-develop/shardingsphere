@@ -44,7 +44,7 @@ import java.util.concurrent.ConcurrentHashMap;
 @Getter
 public final class ShardingSphereMetaData {
     /**
-     * 加载表的信息：列、索引、约束
+     * 配置的逻辑库、系统库的表的信息：列、索引、约束
      */
     private final Map<String, ShardingSphereDatabase> databases;
     /**

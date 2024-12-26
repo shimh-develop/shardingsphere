@@ -32,12 +32,19 @@ import java.util.logging.Logger;
  */
 @RequiredArgsConstructor
 public final class CatalogSwitchableDataSource implements DataSource, AutoCloseable {
-    
+    /**
+     * 实际的数据源对象
+     */
     @Getter
     private final DataSource dataSource;
-    
+    /**
+     * 从jdbc_url解析的数据库名 demo_ds_0
+     * url -> jdbc:mysql://localhost:3306/demo_ds_0
+     */
     private final String catalog;
-    
+    /**
+     * url -> jdbc:mysql://localhost:3306/demo_ds_0
+     */
     @Getter
     private final String url;
     

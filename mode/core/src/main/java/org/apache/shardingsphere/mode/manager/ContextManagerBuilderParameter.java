@@ -25,6 +25,7 @@ import org.apache.shardingsphere.infra.config.database.impl.DataSourceProvidedDa
 import org.apache.shardingsphere.infra.config.mode.ModeConfiguration;
 import org.apache.shardingsphere.infra.config.rule.RuleConfiguration;
 import org.apache.shardingsphere.infra.instance.metadata.InstanceMetaData;
+import org.apache.shardingsphere.infra.instance.metadata.jdbc.JDBCInstanceMetaData;
 
 import javax.sql.DataSource;
 import java.util.Collection;
@@ -59,7 +60,10 @@ public final class ContextManagerBuilderParameter {
     private final Properties props;
     // 未配置
     private final Collection<String> labels;
-    // 当前SharingSphere实例元数据信息
+    /**
+     * 当前ShardingSphere实例的元数据信息 id(uuid)、本机ip、shardingsphere版本号
+     * @see JDBCInstanceMetaData
+     */
     private final InstanceMetaData instanceMetaData;
     // true
     private final boolean force;

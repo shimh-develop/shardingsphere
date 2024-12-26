@@ -33,7 +33,9 @@ import java.util.concurrent.ConcurrentHashMap;
 public final class GlobalDataSourceRegistry {
     
     private static final GlobalDataSourceRegistry INSTANCE = new GlobalDataSourceRegistry();
-    
+    /**
+     * dataSourceName : 数据源对象
+     */
     private final Map<String, DataSource> cachedDataSources = new ConcurrentHashMap<>();
     
     private final Map<String, String> cachedDatabaseTables = new ConcurrentHashMap<>();

@@ -47,7 +47,9 @@ import java.sql.Statement;
 public final class ShardingSphereConnection extends AbstractConnectionAdapter {
     
     private final ProcessEngine processEngine = new ProcessEngine();
-    
+    /**
+     * 逻辑库名 logic_db
+     */
     @Getter
     private final String databaseName;
     

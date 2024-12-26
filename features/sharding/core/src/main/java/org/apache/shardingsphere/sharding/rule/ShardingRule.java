@@ -150,7 +150,7 @@ public final class ShardingRule implements DatabaseRule {
     public ShardingRule(final ShardingRuleConfiguration ruleConfig, final Map<String, DataSource> dataSources, final InstanceContext instanceContext) {
         configuration = ruleConfig;
         /**
-         * 解析 tables的actualDataNodes 和 autoTables的actualDataSources 中指定的数据源名称
+         * 解析 tables的actualDataNodes 和 autoTables的actualDataSources 表达式中指定的数据源名称
          *
          * tables: # 数据分片规则配置
          *     <logic_table_name> (+): # 逻辑表名称
@@ -261,6 +261,10 @@ public final class ShardingRule implements DatabaseRule {
     }
     
     private Collection<String> getDataSourceNames(final ShardingTableRuleConfiguration shardingTableRuleConfig) {
+        /**
+         * 表达式解析
+         * ds_${0..1}.t_order_${0..1} -> ds_0.t_order_0、ds_0.t_order_1、ds_1.t_order_0、ds_1.t_order_1
+         */
         List<String> actualDataNodes = InlineExpressionParserFactory.newInstance(shardingTableRuleConfig.getActualDataNodes()).splitAndEvaluate();
         return actualDataNodes.stream().map(each -> new DataNode(each).getDataSourceName()).collect(Collectors.toList());
     }

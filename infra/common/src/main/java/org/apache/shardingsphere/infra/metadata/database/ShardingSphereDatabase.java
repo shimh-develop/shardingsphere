@@ -103,7 +103,7 @@ public final class ShardingSphereDatabase {
         Collection<ShardingSphereRule> databaseRules = DatabaseRulesBuilder.build(name, protocolType, databaseConfig, instanceContext);
         /**
          * 从数据库加载表的信息：列、索引、约束
-         * key: 表名
+         * key: 逻辑库名 logic_db
          */
         Map<String, ShardingSphereSchema> schemas = new ConcurrentHashMap<>(GenericSchemaBuilder
                 .build(new GenericSchemaBuilderMaterial(protocolType, storageTypes, DataSourceStateManager.getInstance().getEnabledDataSources(name, databaseConfig), databaseRules,

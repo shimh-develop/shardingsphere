@@ -121,9 +121,15 @@ public final class ShardingTable {
      * value: 解析actualDataNodes配置的表名或逻辑表名
      */
     private final Map<String, Collection<String>> dataSourceToTablesMap = new HashMap<>();
-    
+    /**
+     * ds_0 -> ds_ 数据源前缀
+     * ds_0、ds_1 -> 1 数据源后缀里最小的长度
+     */
     private final DataNodeInfo dataSourceDataNode;
-    
+    /**
+     * t_order_0 -> t_order_ 表名前缀
+     * t_order_0、t_order_1 -> 1 表名后缀里最小的字符长度
+     */
     private final DataNodeInfo tableDataNode;
     
     public ShardingTable(final Collection<String> dataSourceNames, final String logicTableName) {
@@ -168,8 +174,9 @@ public final class ShardingTable {
         KeyGenerateStrategyConfiguration keyGeneratorConfig = tableRuleConfig.getKeyGenerateStrategy();
         generateKeyColumn = null == keyGeneratorConfig || Strings.isNullOrEmpty(keyGeneratorConfig.getColumn()) ? defaultGenerateKeyColumn : keyGeneratorConfig.getColumn();
         keyGeneratorName = null == keyGeneratorConfig ? null : keyGeneratorConfig.getKeyGeneratorName();
-
+        // 数据源名信息
         dataSourceDataNode = actualDataNodes.isEmpty() ? null : createDataSourceDataNode(actualDataNodes);
+        // 表名信息
         tableDataNode = actualDataNodes.isEmpty() ? null : createTableDataNode(actualDataNodes);
         checkRule(dataNodes);
     }

@@ -39,25 +39,43 @@ import java.util.concurrent.atomic.AtomicInteger;
 @RequiredArgsConstructor
 @Getter
 public final class Process {
-    
+    /**
+     * 空
+     */
     private final Map<ExecutionUnit, Statement> processStatements = new ConcurrentHashMap<>();
-    
+    /**
+     * uuid
+     */
     private final String id;
-    
+    /**
+     * 开始时间
+     */
     private final long startMillis;
-    
+    /**
+     * 空
+     */
     private final String sql;
-    
+    /**
+     * logic_db
+     */
     private final String databaseName;
-    
+    /**
+     * 空
+     */
     private final String username;
-    
+    /**
+     * 空
+     */
     private final String hostname;
-    
+    /**
+     * 0
+     */
     private final int totalUnitCount;
     
     private final AtomicInteger completedUnitCount;
-    
+    /**
+     * false
+     */
     private final boolean idle;
     
     private final AtomicBoolean interrupted;

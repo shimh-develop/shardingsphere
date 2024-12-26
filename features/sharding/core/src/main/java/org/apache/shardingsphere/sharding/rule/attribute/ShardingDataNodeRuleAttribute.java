@@ -33,9 +33,13 @@ import java.util.Optional;
  * Sharding data node rule attribute.
  */
 public final class ShardingDataNodeRuleAttribute implements DataNodeRuleAttribute {
-    
+    /**
+     * key: 逻辑表名 value: 规则
+     */
     private final Map<String, ShardingTable> shardingTables;
-    
+    /**
+     * key: 逻辑表名 value: 物理节点 数据源+表名
+     */
     private final Map<String, Collection<DataNode>> tableDataNodes;
     
     public ShardingDataNodeRuleAttribute(final Map<String, ShardingTable> shardingTables) {

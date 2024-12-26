@@ -28,9 +28,13 @@ import java.util.Collection;
  * Sharding table mapper rule attribute.
  */
 public final class ShardingTableNamesRuleAttribute implements TableMapperRuleAttribute {
-    
+    /**
+     * 逻辑表名 t_order t_order_item
+     */
     private final CaseInsensitiveSet<String> logicalTableNames;
-    
+    /**
+     * 物理表名 t_order_0 t_order_1 t_order_item_0 t_order_item_1
+     */
     private final CaseInsensitiveSet<String> actualTableNames;
     
     public ShardingTableNamesRuleAttribute(final Collection<ShardingTable> shardingTables) {

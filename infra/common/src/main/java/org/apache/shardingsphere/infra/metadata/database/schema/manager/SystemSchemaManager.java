@@ -131,6 +131,9 @@ public final class SystemSchemaManager {
      */
     public static Collection<InputStream> getAllInputStreams(final String databaseType, final String schema) {
         Collection<InputStream> result = new LinkedList<>();
+        /**
+         * infra/database/type/mysql/src/main/resources/schema/mysql/xx/xx.ymal
+         */
         result.addAll(getInputStreams(databaseType, schema));
         result.addAll(getInputStreams(COMMON, schema));
         return result;

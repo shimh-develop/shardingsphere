@@ -57,6 +57,9 @@ public final class DataNode {
      * @param dataNode string of data node. use {@code .} to split data source name and table name.
      */
     public DataNode(final String dataNode) {
+        /**
+         * ds_0.t_order_0 -> dataSourceName: ds_0   tableName: t_order_0
+         */
         // TODO remove duplicated splitting?
         boolean isIncludeInstance = isActualDataNodesIncludedDataSourceInstance(dataNode);
         if (!isIncludeInstance && !isValidDataNode(dataNode, 2)) {

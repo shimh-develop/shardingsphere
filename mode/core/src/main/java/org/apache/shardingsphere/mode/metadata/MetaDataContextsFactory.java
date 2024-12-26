@@ -95,7 +95,9 @@ public final class MetaDataContextsFactory {
         Map<String, DatabaseConfiguration> effectiveDatabaseConfigs = isDatabaseMetaDataExisted
                 ? createEffectiveDatabaseConfigurations(getDatabaseNames(instanceContext, param.getDatabaseConfigs(), persistService), param.getDatabaseConfigs(), persistService)
                 : param.getDatabaseConfigs();
-        // 单机模式 不走 跳过
+        /**
+         * 通过dataSource.getConnection() 校验数据源是否可用
+         */
         checkDataSourceStates(effectiveDatabaseConfigs, storageNodes, param.isForce());
 
         // TODO load global data sources from persist service
@@ -106,7 +108,8 @@ public final class MetaDataContextsFactory {
         // 属性配置
         ConfigurationProperties props = isDatabaseMetaDataExisted ? new ConfigurationProperties(persistService.getPropsService().load()) : new ConfigurationProperties(param.getProps());
         /**
-         * 加载表的信息：列、索引、约束
+         * 加载库(配置的表和系统库: mysql、sys...)的表的信息：列、索引、约束
+         * key: 数据库名
          */
         Map<String, ShardingSphereDatabase> databases = isDatabaseMetaDataExisted
                 ? InternalMetaDataFactory.create(persistService, effectiveDatabaseConfigs, props, instanceContext)
@@ -160,6 +163,9 @@ public final class MetaDataContextsFactory {
         Map<String, DataSourceState> storageDataSourceStates = getStorageDataSourceStates(storageNodes);
         databaseConfigs.forEach((key, value) -> {
             if (!value.getStorageUnits().isEmpty()) {
+                /**
+                 * 通过dataSource.getConnection() 校验数据源是否可用
+                 */
                 DataSourceStateManager.getInstance().initStates(key, value.getStorageUnits(), storageDataSourceStates, force);
             }
         });

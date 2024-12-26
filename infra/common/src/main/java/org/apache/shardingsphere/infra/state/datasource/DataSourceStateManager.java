@@ -43,7 +43,9 @@ import java.util.stream.Collectors;
 public final class DataSourceStateManager {
     
     private static final DataSourceStateManager INSTANCE = new DataSourceStateManager();
-    
+    /**
+     * key: databaseName(逻辑库名称).数据源名
+     */
     private final Map<String, DataSourceState> dataSourceStates = new ConcurrentHashMap<>();
     
     private volatile boolean forceStart;

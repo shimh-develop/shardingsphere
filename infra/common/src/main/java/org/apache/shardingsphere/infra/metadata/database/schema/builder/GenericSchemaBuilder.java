@@ -82,6 +82,8 @@ public final class GenericSchemaBuilder {
      */
     public static Map<String, ShardingSphereSchema> build(final Collection<String> tableNames, final GenericSchemaBuilderMaterial material) throws SQLException {
         /**
+         * tableNames-> 规则配置中指定的所有逻辑表名
+         *
          * 从数据库加载表的信息：列、索引、约束
          * key: 表名
          */

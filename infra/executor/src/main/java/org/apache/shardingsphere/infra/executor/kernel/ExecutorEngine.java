@@ -40,7 +40,9 @@ import java.util.concurrent.Future;
 @HighFrequencyInvocation
 @Getter
 public final class ExecutorEngine implements AutoCloseable {
-    
+    /**
+     * 线程池
+     */
     private final ExecutorServiceManager executorServiceManager;
     
     private ExecutorEngine(final int executorSize) {

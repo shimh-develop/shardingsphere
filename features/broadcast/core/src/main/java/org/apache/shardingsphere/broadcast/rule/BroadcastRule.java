@@ -42,11 +42,17 @@ import java.util.stream.Collectors;
 public final class BroadcastRule implements DatabaseRule {
     
     private final BroadcastRuleConfiguration configuration;
-    
+    /**
+     * JDBC 逻辑库名称 databaseName
+     */
     private final String databaseName;
-    
+    /**
+     * 配置的表名
+     */
     private final Collection<String> tables;
-    
+    /**
+     * 数据源名称 ds_0...
+     */
     private final Collection<String> dataSourceNames;
     
     private final RuleAttributes attributes;

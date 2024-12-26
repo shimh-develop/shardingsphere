@@ -20,6 +20,7 @@ package org.apache.shardingsphere.infra.metadata.database.resource.unit;
 import lombok.Getter;
 import org.apache.shardingsphere.infra.database.core.connector.ConnectionProperties;
 import org.apache.shardingsphere.infra.database.core.connector.ConnectionPropertiesParser;
+import org.apache.shardingsphere.infra.database.core.connector.StandardConnectionProperties;
 import org.apache.shardingsphere.infra.database.core.connector.url.StandardJdbcUrlParser;
 import org.apache.shardingsphere.infra.database.core.spi.DatabaseTypedSPILoader;
 import org.apache.shardingsphere.infra.database.core.type.DatabaseType;
@@ -60,6 +61,7 @@ public final class StorageUnit {
     /**
      * 从jdbc_url解析的相关信息
      * url -> jdbc:mysql://localhost:3306/demo_ds_0
+     * @see StandardConnectionProperties
      */
     private final ConnectionProperties connectionProperties;
     

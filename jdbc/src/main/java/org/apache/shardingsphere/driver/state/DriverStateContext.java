@@ -19,7 +19,9 @@ package org.apache.shardingsphere.driver.state;
 
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
+import org.apache.shardingsphere.driver.state.ok.OKDriverState;
 import org.apache.shardingsphere.infra.spi.type.typed.TypedSPILoader;
+import org.apache.shardingsphere.infra.state.instance.InstanceState;
 import org.apache.shardingsphere.mode.manager.ContextManager;
 
 import java.sql.Connection;
@@ -38,6 +40,10 @@ public final class DriverStateContext {
      * @return connection
      */
     public static Connection getConnection(final String databaseName, final ContextManager contextManager) {
+        /**
+         * @see InstanceState#OK
+         * @see OKDriverState
+         */
         return TypedSPILoader.getService(
                 DriverState.class, contextManager.getInstanceContext().getInstance().getState().getCurrentState().name()).getConnection(databaseName, contextManager);
     }

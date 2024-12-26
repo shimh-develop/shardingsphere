@@ -59,6 +59,9 @@ public final class SystemSchemaBuilder {
         boolean isSystemSchemaMetaDataEnabled = isSystemSchemaMetaDataEnabled(props.getProps());
         YamlTableSwapper swapper = new YamlTableSwapper();
         for (String each : getSystemSchemas(databaseName, databaseType, systemDatabase)) {
+            /**
+             * infra/database/type/mysql/src/main/resources/schema/mysql 从配置文件加载表
+             */
             result.put(each.toLowerCase(), createSchema(each, SystemSchemaManager.getAllInputStreams(databaseType.getType(), each), swapper, isSystemSchemaMetaDataEnabled));
         }
         return result;

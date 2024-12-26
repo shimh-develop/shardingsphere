@@ -39,15 +39,25 @@ import java.util.stream.Collectors;
 public final class GenericSchemaBuilderMaterial {
     
     private final DatabaseType protocolType;
-    
+    /**
+     * key: 数据源名 value: 对应的数据库类型对象
+     */
     private final Map<String, DatabaseType> storageTypes;
-    
+    /**
+     * key: 数据源名 value: 数据源对象
+     */
     private final Map<String, DataSource> dataSourceMap;
-    
+    /**
+     * 规则对象：分表...
+     */
     private final Collection<ShardingSphereRule> rules;
-    
+    /**
+     * 配置的属性
+     */
     private final ConfigurationProperties props;
-    
+    /**
+     * 逻辑库名 logic_name
+     */
     private final String defaultSchemaName;
     
     public GenericSchemaBuilderMaterial(final DatabaseType protocolType, final Map<String, StorageUnit> storageUnits,

@@ -73,7 +73,7 @@ public final class ContextManager implements AutoCloseable {
     private final ConfigurationContextManager configurationContextManager;
     
     private final ResourceMetaDataContextManager resourceMetaDataContextManager;
-    
+    // 线程池
     private final ExecutorEngine executorEngine;
     
     private final ClusterStateContext clusterStateContext = new ClusterStateContext();

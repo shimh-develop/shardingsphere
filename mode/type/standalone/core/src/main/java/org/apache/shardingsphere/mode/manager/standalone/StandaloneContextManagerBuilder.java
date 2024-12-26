@@ -60,7 +60,7 @@ public final class StandaloneContextManagerBuilder implements ContextManagerBuil
          *       password: Test@123
          * 默认
          * @see org.apache.shardingsphere.mode.repository.standalone.jdbc.JDBCRepository
-         *  在数据库中创建表，未配置默认使用H2
+         *  在数据库中创建保存持久化数据的repository表，未配置默认使用H2
          *
          */
         StandalonePersistRepository repository = TypedSPILoader.getService(

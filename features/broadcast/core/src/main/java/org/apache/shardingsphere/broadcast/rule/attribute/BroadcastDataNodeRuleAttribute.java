@@ -30,9 +30,13 @@ import java.util.stream.Collectors;
  * Broadcast data node rule attribute.
  */
 public final class BroadcastDataNodeRuleAttribute implements DataNodeRuleAttribute {
-    
+    /**
+     * 配置的表名
+     */
     private final Collection<String> tables;
-    
+    /**
+     * key:表名  value: 数据源 + 表名
+     */
     private final Map<String, Collection<DataNode>> tableDataNodes;
     
     public BroadcastDataNodeRuleAttribute(final Collection<String> dataSourceNames, final Collection<String> tables) {

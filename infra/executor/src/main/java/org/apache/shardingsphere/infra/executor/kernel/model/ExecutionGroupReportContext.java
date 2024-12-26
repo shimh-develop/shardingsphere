@@ -27,10 +27,14 @@ import org.apache.shardingsphere.infra.metadata.user.Grantee;
 @RequiredArgsConstructor
 @Getter
 public final class ExecutionGroupReportContext {
-    
+    /**
+     * uuid
+     */
     // TODO processID should same with connectionId
     private final String processId;
-    
+    /**
+     * logic_db
+     */
     private final String databaseName;
     
     private final Grantee grantee;

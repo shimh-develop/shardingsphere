@@ -76,6 +76,10 @@ public final class ExternalMetaDataFactory {
          * 加载表的信息：列、索引、约束
          */
         result.putAll(createGenericDatabases(databaseConfigMap, protocolType, systemDatabase, props, instanceContext));
+        /**
+         * 从配置文件加载系统数据库表
+         * 配置文件地址：infra/database/type/mysql/src/main/resources/schema/mysql
+         */
         result.putAll(createSystemDatabases(databaseConfigMap, protocolType, systemDatabase, props));
         return result;
     }
@@ -88,7 +92,7 @@ public final class ExternalMetaDataFactory {
             String databaseName = entry.getKey();
             if (!entry.getValue().getStorageUnits().isEmpty() || !systemDatabase.getSystemSchemas().contains(databaseName)) {
                 /**
-                 * 数据源对应的数据库类型
+                 * 数据源getConnection获取对应的数据库类型
                  */
                 Map<String, DatabaseType> storageTypes = DatabaseTypeEngine.getStorageTypes(entry.getKey(), entry.getValue());
                 /**

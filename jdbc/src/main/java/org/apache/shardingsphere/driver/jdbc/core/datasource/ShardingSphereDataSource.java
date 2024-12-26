@@ -86,7 +86,7 @@ public final class ShardingSphereDataSource extends AbstractDataSourceAdapter im
     private ContextManager createContextManager(final String databaseName, final ModeConfiguration modeConfig, final Map<String, DataSource> dataSourceMap,
                                                 final Collection<RuleConfiguration> ruleConfigs, final Properties props) throws SQLException {
         /**
-         * 当前ShardingSphere实例的元数据信息 id、本机ip、shardingsphere版本号
+         * 当前ShardingSphere实例的元数据信息 id(uuid)、本机ip、shardingsphere版本号
          * @see JDBCInstanceMetaData
          */
         InstanceMetaData instanceMetaData = TypedSPILoader.getService(InstanceMetaDataBuilder.class, "JDBC").build(-1);

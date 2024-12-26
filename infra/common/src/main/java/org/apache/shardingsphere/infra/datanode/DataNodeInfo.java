@@ -26,10 +26,19 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 @Getter
 public final class DataNodeInfo {
-    
+    /**
+     * 数据源或表名前缀
+     * ds_0 -> ds_
+     * t_order_0 -> t_order_
+     */
     private final String prefix;
-    
+    /**
+     * 数据源后缀里最小的长度
+     * ds_0、ds_1 -> 1
+     */
     private final int suffixMinLength;
-    
+    /**
+     * '0'
+     */
     private final char paddingChar;
 }

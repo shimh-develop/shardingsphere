@@ -30,7 +30,7 @@ import java.util.Collection;
 @RequiredArgsConstructor
 @Getter
 public final class ExecutionGroupContext<T> {
-    
+    // 空
     private final Collection<ExecutionGroup<T>> inputGroups;
     
     private final ExecutionGroupReportContext reportContext;
